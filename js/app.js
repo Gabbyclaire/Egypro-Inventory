@@ -1384,7 +1384,7 @@ function inferCategory(row = {}) {
   return 'Desktop';
 }
 
-function processImportedRows(rows, fileName = 'unknown') {
+function processImportedRows(rows, fileName = 'unknown', headerRowIndex = 0) {
   if (!rows || !rows.length) { toast('No rows found to import', 'error'); return; }
   const headerMap = {
     'asset code':'code','code':'code','new convention':'code','new convention number':'code','new convention name':'code',
@@ -1395,8 +1395,9 @@ function processImportedRows(rows, fileName = 'unknown') {
     'office':'office','office version 365 family':'office','antivirus':'av','antivirus version':'av','antivirus version -norton 360':'av','status':'status','assigned to':'user','user':'user','location':'user','collected from':'collected','collected':'collected','vendor':'vendor','purchase date':'notes','notes':'notes','assigned to / location':'user','department':'dept','dept':'dept','department project':'dept'
   };
 
-  let added = 0, skipped = 0;
-  rows.forEach(raw => {
+  let added = 0;
+  let skippedRows = [];
+  rows.forEach((raw, index) => {
     const out = {};
     Object.keys(raw).forEach(k => {
       const v = (raw[k] ?? '').toString().trim();
@@ -1412,15 +1413,44 @@ function processImportedRows(rows, fileName = 'unknown') {
     out.hostname = out.hostname || out.code || '';
     out.user = out.user || '';
     out.sourceFile = fileName;
-    if (!out.code) { skipped++; return; }
-    try { store.add(out); added++; } catch (e) { console.warn('Import add failed', e); skipped++; }
+    out.code = out.code || out.serial || out.hostname;
+    
+    if (!out.code) { 
+      // It's missing a code. Should we loudly skip or silently drop?
+      const dataValues = Object.values(raw).filter(val => val !== undefined && val !== null && String(val).trim() !== '');
+      if (dataValues.length <= 3) { 
+        // 3 or fewer fields of random text but no code -> likely a subheader, notes, or ghost row.
+        return; // Silently ignore so management doesn't see an error.
+      }
+      
+      console.warn('Skipped row (has data but missing code, serial, and hostname):', raw);
+      skippedRows.push(index + headerRowIndex + 2); 
+      return; 
+    }
+    
+    try { store.add(out); added++; } catch (e) { 
+      console.warn('Import add failed', e); 
+      skippedRows.push(index + headerRowIndex + 2); 
+    }
   });
   store.recordImport(fileName, added);
   render();
-  showImportResultModal(fileName, added, skipped);
+  showImportResultModal(fileName, added, skippedRows);
 }
 
-function showImportResultModal(fileName, added, skipped) {
+function showImportResultModal(fileName, added, skippedRows = []) {
+  const skippedCount = Array.isArray(skippedRows) ? skippedRows.length : skippedRows;
+  let skippedHtml = '';
+  if (skippedCount > 0) {
+    let rowList = '';
+    if (Array.isArray(skippedRows) && skippedRows.length > 0) {
+      const displayRows = skippedRows.slice(0, 5).join(', ');
+      const more = skippedRows.length > 5 ? ', ...' : '';
+      rowList = ` <br><span style="color:#6b7280;font-size:12px">(Check Excel Row: ${displayRows}${more})</span>`;
+    }
+    skippedHtml = `<strong style="color:var(--danger, #dc2626)">Skipped:</strong> ${skippedCount} row(s) <span style="color:#6b7280;font-size:13px">(missing Asset Code)</span>${rowList}`;
+  }
+
   openModal(`
   <div class="modal-header">
     <div class="modal-title">✓ Import Complete</div>
@@ -1430,7 +1460,7 @@ function showImportResultModal(fileName, added, skipped) {
     <div style="font-size:14px;line-height:1.6;margin-bottom:16px">
       <strong>File:</strong> ${escHtml(fileName)}<br>
       <strong>Added:</strong> ${added} row(s)<br>
-      ${skipped > 0 ? '<strong>Skipped:</strong> ' + skipped + ' row(s)' : ''}
+      ${skippedCount > 0 ? skippedHtml : ''}
     </div>
     <p style="color:var(--text-secondary);font-size:12px">
       To delete this import, go to Settings → Data management → Imported Data.
