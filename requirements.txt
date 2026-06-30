@@ -1,0 +1,8 @@
+# Backend Service Requirements
+# This project uses Node.js for the backend decryption service.
+# To install these requirements, run `npm install` inside the `backend-service` folder.
+
+express
+multer
+cors
+officecrypto-tool

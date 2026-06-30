@@ -20,20 +20,20 @@ egypro-inventory/
 
 ---
 
-## How to run
+## How to run (Windows)
 
-Just double-click `index.html` — no server needed for basic usage.
+The absolute easiest way to run the application with all features (including Excel decryption) is to simply double-click **`start.bat`**!
 
-### Excel Decryption Backend
-To enable importing of **password-protected Excel files**, you need to run the decryption backend service in the background:
-1. Open a terminal or command prompt in the `backend-service` folder.
-2. Run `npm install` (only needed the first time).
-3. Run `node server.js`.
-4. Keep the terminal window open. The web app will automatically connect to it when you upload an encrypted file.
+`start.bat` will automatically:
+1. Install any missing background requirements
+2. Start the local backend service
+3. Open the web app in your default browser
 
-For a real deployment, drop the whole folder on any static web host
-(Netlify, GitHub Pages, Azure Static Web Apps, etc.) and point the
-domain at `index.html`.
+*Note: You must have [Node.js](https://nodejs.org/) installed for the background service to work.*
+
+### For a real deployment
+Drop the whole folder on any static web host (Netlify, GitHub Pages, Azure Static Web Apps, etc.) and point the domain at `index.html`. 
+*(Note: You will need to host the `backend-service` folder separately on a service like Heroku or Render).*
 
 ---
 
