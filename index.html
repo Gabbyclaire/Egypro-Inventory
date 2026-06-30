@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Egypro IT Inventory</title>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- html2canvas for PNG export (loaded async, falls back gracefully) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       CUSTOMISATION GUIDE
+       ▸ Colors / theme  →  css/style.css  (:root and [data-theme="dark"])
+       ▸ Inventory data  →  js/data.js     (DEFAULT_ASSETS array)
+       ▸ Profile info    →  js/data.js     (PROFILE_DEFAULT object)
+       ▸ Page logic/UI   →  js/app.js
+       ▸ Export formats  →  js/export.js
+       ============================================================ -->
+
+  <div id="app">
+    <!-- App renders here via app.js -->
+    <div style="height:100vh;display:flex;align-items:center;justify-content:center;
+                font-family:system-ui,sans-serif;color:#888;font-size:14px">
+      Loading Egypro IT Inventory…
+    </div>
+  </div>
+
+  <!-- Scripts (order matters: data → export → app) -->
+  <script src="js/data.js"></script>
+  <script src="js/export.js"></script>
+  <!-- SheetJS (optional Excel import) and app script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
