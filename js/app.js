@@ -1286,15 +1286,42 @@ async function handleImportFile(e) {
       const data = await f.arrayBuffer();
       let wb;
       try {
-        const password = await promptForExcelPassword(fileName);
-        wb = XLSX.read(data, { type: 'array', password: password || undefined });
+        wb = XLSX.read(data, { type: 'array' });
       } catch (err) {
         const msg = String(err && err.message ? err.message : err);
         if (/password|encrypted/i.test(msg)) {
-          toast('This Excel file is password protected. Please provide the correct password to import it.', 'error');
-          return;
+          const password = await promptForExcelPassword(fileName);
+          if (!password) {
+            toast('Password is required to decrypt this file.', 'error');
+            return;
+          }
+          toast('Decrypting file...', 'info');
+          
+          const formData = new FormData();
+          formData.append('file', f);
+          formData.append('password', password);
+          
+          try {
+            const response = await fetch('http://localhost:4000/decrypt-excel', {
+              method: 'POST',
+              body: formData
+            });
+            
+            if (!response.ok) {
+              const errData = await response.json().catch(() => ({}));
+              throw new Error(errData.error || `Server error: ${response.status}`);
+            }
+            
+            const decData = await response.arrayBuffer();
+            wb = XLSX.read(decData, { type: 'array' });
+            toast('Decryption successful', 'success');
+          } catch (decErr) {
+            toast('Decryption failed: ' + decErr.message, 'error');
+            return;
+          }
+        } else {
+          throw err;
         }
-        throw err;
       }
       const sheet = wb.SheetNames[0];
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { defval: '' });
