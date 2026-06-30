@@ -1416,16 +1416,12 @@ function processImportedRows(rows, fileName = 'unknown', headerRowIndex = 0) {
     out.code = out.code || out.serial || out.hostname;
     
     if (!out.code) { 
-      // It's missing a code. Should we loudly skip or silently drop?
       const dataValues = Object.values(raw).filter(val => val !== undefined && val !== null && String(val).trim() !== '');
       if (dataValues.length <= 3) { 
-        // 3 or fewer fields of random text but no code -> likely a subheader, notes, or ghost row.
-        return; // Silently ignore so management doesn't see an error.
+        return; // Silently ignore ghost rows
       }
-      
-      console.warn('Skipped row (has data but missing code, serial, and hostname):', raw);
-      skippedRows.push(index + headerRowIndex + 2); 
-      return; 
+      // Row has full data but no code, import it anyway
+      out.code = 'N/A';
     }
     
     try { store.add(out); added++; } catch (e) { 
@@ -1442,13 +1438,7 @@ function showImportResultModal(fileName, added, skippedRows = []) {
   const skippedCount = Array.isArray(skippedRows) ? skippedRows.length : skippedRows;
   let skippedHtml = '';
   if (skippedCount > 0) {
-    let rowList = '';
-    if (Array.isArray(skippedRows) && skippedRows.length > 0) {
-      const displayRows = skippedRows.slice(0, 5).join(', ');
-      const more = skippedRows.length > 5 ? ', ...' : '';
-      rowList = ` <br><span style="color:#6b7280;font-size:12px">(Check Excel Row: ${displayRows}${more})</span>`;
-    }
-    skippedHtml = `<strong style="color:var(--danger, #dc2626)">Skipped:</strong> ${skippedCount} row(s) <span style="color:#6b7280;font-size:13px">(missing Asset Code)</span>${rowList}`;
+    skippedHtml = `<strong style="color:var(--danger, #dc2626)">Skipped:</strong> ${skippedCount} row(s) <span style="color:#6b7280;font-size:13px">(invalid data)</span>`;
   }
 
   openModal(`
