@@ -1297,7 +1297,16 @@ async function handleImportFile(e) {
         throw err;
       }
       const sheet = wb.SheetNames[0];
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { defval: '' });
+      const rawArrays = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { header: 1, defval: '' });
+      let headerRowIndex = 0;
+      for (let i = 0; i < Math.min(10, rawArrays.length); i++) {
+        const rowText = rawArrays[i].join(' ').toLowerCase();
+        if (rowText.includes('new convention') || rowText.includes('serial') || rowText.includes('computer name') || rowText.includes('asset code')) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { range: headerRowIndex, defval: '' });
       processImportedRows(rows, fileName);
     } else {
       toast('Unsupported file type — please use CSV or Excel (.xls/.xlsx)', 'error');

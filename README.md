@@ -22,7 +22,14 @@ egypro-inventory/
 
 ## How to run
 
-Just double-click `index.html` — no server needed.
+Just double-click `index.html` — no server needed for basic usage.
+
+### Excel Decryption Backend
+To enable importing of **password-protected Excel files**, you need to run the decryption backend service in the background:
+1. Open a terminal or command prompt in the `backend-service` folder.
+2. Run `npm install` (only needed the first time).
+3. Run `node server.js`.
+4. Keep the terminal window open. The web app will automatically connect to it when you upload an encrypted file.
 
 For a real deployment, drop the whole folder on any static web host
 (Netlify, GitHub Pages, Azure Static Web Apps, etc.) and point the
