@@ -63,7 +63,7 @@ const store = (() => {
     name:     'Gabby',
     initials: 'G',
     role:     'IT Attaché',
-    org:      'Egypro Communications',
+    org:      'Egypro ',
     email:    'g.kariuki@egypro.co.ke',
     phone:    '+254 700 000 000',
     joined:   '2025-01-15',
