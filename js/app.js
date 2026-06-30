@@ -10,7 +10,7 @@
 const state = {
   page:       'inventory',   // 'inventory' | 'dept' | 'cctv' | 'door' | 'profile' | 'settings'
   cat:        'all',
-  dept:       'all',         // 'all' | 'Huawei' | 'ABS'
+  dept:       'all',         // 'all' | 'Huawei' | 'ATC BRANCH'
   status:     'all',
   mfr:        'all',
   os:         'all',
@@ -159,11 +159,11 @@ function sidebarHTML(stats, profile) {
         <span>Huawei</span>
         <span class="sidebar-badge">${stats.byDept.Huawei}</span>
       </button>
-      <button class="sidebar-item ${state.page==='dept'&&state.dept==='ABS'?'active':''}"
-              onclick="setDeptPage('ABS')">
+      <button class="sidebar-item ${state.page==='dept'&&state.dept==='ATC BRANCH'?'active':''}"
+              onclick="setDeptPage('ATC BRANCH')">
         <span class="icon">🏢</span>
-        <span>ABS</span>
-        <span class="sidebar-badge">${stats.byDept.ABS}</span>
+        <span>ATC BRANCH</span>
+        <span class="sidebar-badge">${stats.byDept['ATC BRANCH']}</span>
       </button>
     </div>
 
@@ -387,9 +387,9 @@ function deptHTML(stats) {
     </div>
     <div class="stat-card">
       <div class="stat-card-icon" style="background:var(--status-ok-bg);color:var(--status-ok-text)">🏢</div>
-      <div class="stat-card-label">ABS assets</div>
-      <div class="stat-card-val">${stats.byDept.ABS}</div>
-      <div class="stat-card-sub">assigned to ABS dept</div>
+      <div class="stat-card-label">ATC BRANCH assets</div>
+      <div class="stat-card-val">${stats.byDept['ATC BRANCH']}</div>
+      <div class="stat-card-sub">assigned to ATC BRANCH dept</div>
     </div>
   </div>
 
@@ -402,7 +402,7 @@ function deptHTML(stats) {
     <select class="filter-select" onchange="setDeptFilter(this.value)">
       <option value="all"    ${state.dept==='all'?'selected':''}>All Departments</option>
       <option value="Huawei" ${state.dept==='Huawei'?'selected':''}>Huawei</option>
-      <option value="ABS"    ${state.dept==='ABS'?'selected':''}>ABS</option>
+      <option value="ATC BRANCH"    ${state.dept==='ATC BRANCH'?'selected':''}>ATC BRANCH</option>
     </select>
   </div>
 
@@ -713,7 +713,7 @@ function assetFormHTML(a = {}) {
         <select id="f-dept">
           <option value=""       ${!a.dept?'selected':''}>— None —</option>
           <option value="Huawei" ${a.dept==='Huawei'?'selected':''}>Huawei</option>
-          <option value="ABS"    ${a.dept==='ABS'?'selected':''}>ABS</option>
+          <option value="ATC BRANCH"    ${a.dept==='ATC BRANCH'?'selected':''}>ATC BRANCH</option>
         </select>
       </div>
       <div class="form-field">

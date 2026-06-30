@@ -19,7 +19,7 @@ const store = (() => {
     { id:5,  cat:'Desktop',    dept:'',       user:'Finance',         code:'EGPROD05', hostname:'EGPROD05',    manufacturer:'DELL',   model:'OptiPlex 5090',        cpu:3.0, ram:16,  hdd:512,  serial:'FN5090A',   os:'MS WIN 11 Pro', office:'Microsoft 365', av:'',            status:'Needs attention', collected:'',                vendor:'',         notes:'AV licence expired' },
     { id:6,  cat:'Laptop',     dept:'Huawei', user:'Huawei Lead',     code:'LTPROD01', hostname:'LT-HW01',     manufacturer:'Lenovo', model:'ThinkPad X1 Carbon',   cpu:2.8, ram:16,  hdd:512,  serial:'LN29X1C',   os:'MS WIN 11 Pro', office:'Microsoft 365', av:'Norton 360',  status:'OK',              collected:'IT Dept',         vendor:'Leverage', notes:'' },
     { id:7,  cat:'Laptop',     dept:'Huawei', user:'Huawei Engineer', code:'LTPROD02', hostname:'LT-HW02',     manufacturer:'HP',     model:'EliteBook 840 G8',     cpu:2.4, ram:8,   hdd:256,  serial:'HP84E002',  os:'MS WIN 10 Pro', office:'',              av:'',            status:'OK',              collected:'IT Dept',         vendor:'',         notes:'' },
-    { id:8,  cat:'Laptop',     dept:'ABS',    user:'ABS Manager',     code:'LTPROD03', hostname:'LT-ABS01',    manufacturer:'Lenovo', model:'ThinkPad E14',         cpu:2.6, ram:8,   hdd:256,  serial:'LNE14003',  os:'MS WIN 11 Pro', office:'Microsoft 365', av:'',            status:'Decommissioned',  collected:'',                vendor:'',         notes:'Screen cracked — awaiting replacement' },
+    { id:8,  cat:'Laptop',     dept:'ATC BRANCH',    user:'ATC BRANCH Manager',     code:'LTPROD03', hostname:'LT-ABS01',    manufacturer:'Lenovo', model:'ThinkPad E14',         cpu:2.6, ram:8,   hdd:256,  serial:'LNE14003',  os:'MS WIN 11 Pro', office:'Microsoft 365', av:'',            status:'Decommissioned',  collected:'',                vendor:'',         notes:'Screen cracked — awaiting replacement' },
     { id:9,  cat:'DataCentre', dept:'',       user:'Server Room',     code:'SVPROD01', hostname:'SV-MAIN',     manufacturer:'DELL',   model:'PowerEdge R740',       cpu:3.0, ram:64,  hdd:4000, serial:'SVDL001',   os:'Ubuntu 22 LTS', office:'',              av:'ClamAV',      status:'OK',              collected:'IT Dept',         vendor:'Leverage', notes:'' },
     { id:10, cat:'Printer',    dept:'',       user:'Admin Block',     code:'PRPROD01', hostname:'PR-ADMIN',    manufacturer:'HP',     model:'LaserJet Pro M404dn',  cpu:0,   ram:0,   hdd:0,    serial:'HPLJ4004',  os:'',              office:'',              av:'',            status:'OK',              collected:'IT Dept',         vendor:'',         notes:'' },
     { id:11, cat:'Network',    dept:'',       user:'Server Room',     code:'NWPROD01', hostname:'SW-CORE',     manufacturer:'Cisco',  model:'Catalyst 2960X-48FPD', cpu:0,   ram:0,   hdd:0,    serial:'CSC29X01',  os:'IOS 15.2',      office:'',              av:'',            status:'OK',              collected:'IT Dept',         vendor:'Leverage', notes:'' },
@@ -168,7 +168,7 @@ const store = (() => {
       ),
       byDept: {
         Huawei: all.filter(a => a.dept === 'Huawei').length,
-        ABS:    all.filter(a => a.dept === 'ABS').length,
+        'ATC BRANCH': all.filter(a => a.dept === 'ATC BRANCH').length,
       },
     };
   }
