@@ -9,6 +9,68 @@ app.use(express.json());
 
 // Use memory storage for multer so we don't write intermediate files to disk
 const upload = multer({ storage: multer.memoryStorage() });
+const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'Egypro@123',   // ← replace with your real MySQL root password
+  database: 'egypro_inventory'
+});
+
+// ---- ASSETS ----
+app.get('/api/assets', async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM assets');
+  res.json(rows);
+});
+app.post('/api/assets', async (req, res) => {
+  const [r] = await pool.query('INSERT INTO assets SET ?', req.body);
+  res.json({ id: r.insertId, ...req.body });
+});
+app.put('/api/assets/:id', async (req, res) => {
+  await pool.query('UPDATE assets SET ? WHERE id=?', [req.body, req.params.id]);
+  res.json({ success: true });
+});
+app.delete('/api/assets/:id', async (req, res) => {
+  await pool.query('DELETE FROM assets WHERE id=?', [req.params.id]);
+  res.json({ success: true });
+});
+
+// ---- CCTVS ----
+app.get('/api/cctvs', async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM cctvs');
+  res.json(rows);
+});
+app.post('/api/cctvs', async (req, res) => {
+  const [r] = await pool.query('INSERT INTO cctvs SET ?', req.body);
+  res.json({ id: r.insertId, ...req.body });
+});
+app.put('/api/cctvs/:id', async (req, res) => {
+  await pool.query('UPDATE cctvs SET ? WHERE id=?', [req.body, req.params.id]);
+  res.json({ success: true });
+});
+app.delete('/api/cctvs/:id', async (req, res) => {
+  await pool.query('DELETE FROM cctvs WHERE id=?', [req.params.id]);
+  res.json({ success: true });
+});
+
+// ---- DOOR ACCESS CARDS ----
+app.get('/api/door-cards', async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM door_access_cards');
+  res.json(rows);
+});
+app.post('/api/door-cards', async (req, res) => {
+  const [r] = await pool.query('INSERT INTO door_access_cards SET ?', req.body);
+  res.json({ id: r.insertId, ...req.body });
+});
+app.put('/api/door-cards/:id', async (req, res) => {
+  await pool.query('UPDATE door_access_cards SET ? WHERE id=?', [req.body, req.params.id]);
+  res.json({ success: true });
+});
+app.delete('/api/door-cards/:id', async (req, res) => {
+  await pool.query('DELETE FROM door_access_cards WHERE id=?', [req.params.id]);
+  res.json({ success: true });
+});
 
 app.post('/decrypt-excel', upload.single('file'), async (req, res) => {
   try {

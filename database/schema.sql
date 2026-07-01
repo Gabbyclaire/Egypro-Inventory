@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS egypro_inventory;
+USE egypro_inventory;
+
+CREATE TABLE IF NOT EXISTS assets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cat VARCHAR(50), dept VARCHAR(50), code VARCHAR(50) UNIQUE,
+  hostname VARCHAR(100), manufacturer VARCHAR(100), model VARCHAR(100),
+  cpu VARCHAR(50), ram INT, hdd INT, serial VARCHAR(100),
+  os VARCHAR(100), status VARCHAR(50), user VARCHAR(100), notes TEXT,
+  office VARCHAR(100), av VARCHAR(100), collected VARCHAR(100), vendor VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS cctvs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  location VARCHAR(150), ip VARCHAR(50), model VARCHAR(100),
+  status VARCHAR(50), notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS door_access_cards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100), department VARCHAR(50), door_group VARCHAR(100),
+  status VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

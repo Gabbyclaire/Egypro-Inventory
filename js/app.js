@@ -1,9 +1,10 @@
 /* ============================================================
-   app.js — Main Application Logic  (v2.0)
+   app.js — Main Application Logic  (v2.1 — MySQL backed)
    ▸ Pages: inventory | dept | cctv | door | profile | settings
    ▸ Categories: Desktop | Laptop | DataCentre | Printer | Network
    ▸ New: CCTV view, Door Access Cards view, Dept/Project view
    ▸ New: AD Sync trigger in Settings
+   ▸ Updated: async store calls now awaited (MySQL backend)
    ============================================================ */
 
 /* ---- STATE ---- */
@@ -32,8 +33,14 @@ const CATS = [
 ];
 
 /* ---- BOOT ---- */
-function boot() {
+async function boot() {
   store.setTheme(store.getTheme());
+  document.getElementById('app').innerHTML = '<div style="padding:40px;text-align:center;color:#666">Connecting to database…</div>';
+  const result = await store.init();
+  if (!result.success) {
+    document.getElementById('app').innerHTML = '<div style="padding:40px;text-align:center;color:#c00">Could not connect to backend.<br>Make sure the server is running (node server.js in backend-service) then refresh.</div>';
+    return;
+  }
   render();
   document.addEventListener('click', onDocClick);
 }
@@ -649,7 +656,7 @@ function settingsHTML() {
       <h3>About</h3>
       <div class="setting-row">
         <div><div class="setting-row-label">System</div></div>
-        <span style="color:var(--text-secondary);font-size:13px">Egypro IT Inventory v2.0</span>
+        <span style="color:var(--text-secondary);font-size:13px">Egypro IT Inventory v2.1</span>
       </div>
       <div class="setting-row">
         <div><div class="setting-row-label">Built by</div></div>
@@ -799,7 +806,7 @@ function openEditModal(id) { openModal(assetFormHTML(store.getById(id) || {})); 
 window.openAddModal  = openAddModal;
 window.openEditModal = openEditModal;
 
-function saveAsset(id) {
+async function saveAsset(id) {
   const get = i => document.getElementById(i)?.value?.trim() || '';
   const num = i => parseFloat(document.getElementById(i)?.value) || 0;
   const code = get('f-code');
@@ -812,8 +819,8 @@ function saveAsset(id) {
     os: get('f-os'), office: get('f-office'), av: get('f-av'),
     collected: get('f-collected'), vendor: get('f-vendor'), notes: get('f-notes'),
   };
-  if (id) { store.update(id, data); toast('Asset updated', 'success'); }
-  else    { store.add(data);        toast('Asset added',   'success'); }
+  if (id) { await store.update(id, data); toast('Asset updated', 'success'); }
+  else    { await store.add(data);        toast('Asset added',   'success'); }
   closeModal(); render();
 }
 window.saveAsset = saveAsset;
@@ -879,7 +886,7 @@ function confirmDelete(id) {
 }
 window.confirmDelete = confirmDelete;
 
-function doDelete(id) { store.remove(id); closeModal(); toast('Asset deleted', 'info'); render(); }
+async function doDelete(id) { await store.remove(id); closeModal(); toast('Asset deleted', 'info'); render(); }
 window.doDelete = doDelete;
 
 /* ================================================================
@@ -931,13 +938,13 @@ function openEditCCTVModal(id) { openModal(cctvFormHTML(store.getCCTVById(id)||{
 window.openAddCCTVModal  = openAddCCTVModal;
 window.openEditCCTVModal = openEditCCTVModal;
 
-function saveCCTV(id) {
+async function saveCCTV(id) {
   const get = i => document.getElementById(i)?.value?.trim() || '';
   const location = get('cc-location');
   if (!location) { toast('Location is required', 'error'); return; }
   const data = { location, ipAddress: get('cc-ip'), model: get('cc-model'), status: get('cc-status'), notes: get('cc-notes') };
-  if (id) { store.updateCCTV(id, data); toast('Camera updated', 'success'); }
-  else    { store.addCCTV(data);        toast('Camera added',   'success'); }
+  if (id) { await store.updateCCTV(id, data); toast('Camera updated', 'success'); }
+  else    { await store.addCCTV(data);        toast('Camera added',   'success'); }
   closeModal(); render();
 }
 window.saveCCTV = saveCCTV;
@@ -955,7 +962,7 @@ function confirmDeleteCCTV(id) {
 }
 window.confirmDeleteCCTV = confirmDeleteCCTV;
 
-function doDeleteCCTV(id) { store.removeCCTV(id); closeModal(); toast('Camera removed', 'info'); render(); }
+async function doDeleteCCTV(id) { await store.removeCCTV(id); closeModal(); toast('Camera removed', 'info'); render(); }
 window.doDeleteCCTV = doDeleteCCTV;
 
 /* ================================================================
@@ -1003,14 +1010,14 @@ function openEditDoorModal(id) { openModal(doorFormHTML(store.getDoorCardById(id
 window.openAddDoorModal  = openAddDoorModal;
 window.openEditDoorModal = openEditDoorModal;
 
-function saveDoorCard(id) {
+async function saveDoorCard(id) {
   const get = i => document.getElementById(i)?.value?.trim() || '';
   const name = get('dc-name');
   const department = get('dc-dept');
   if (!name || !department) { toast('Name and department are required', 'error'); return; }
   const data = { name, department, doorGroup: get('dc-doorgroup'), status: get('dc-status') };
-  if (id) { store.updateDoorCard(id, data); toast('Card updated', 'success'); }
-  else    { store.addDoorCard(data);        toast('Card added',   'success'); }
+  if (id) { await store.updateDoorCard(id, data); toast('Card updated', 'success'); }
+  else    { await store.addDoorCard(data);        toast('Card added',   'success'); }
   closeModal(); render();
 }
 window.saveDoorCard = saveDoorCard;
@@ -1028,7 +1035,7 @@ function confirmDeleteDoor(id) {
 }
 window.confirmDeleteDoor = confirmDeleteDoor;
 
-function doDeleteDoor(id) { store.removeDoorCard(id); closeModal(); toast('Card removed', 'info'); render(); }
+async function doDeleteDoor(id) { await store.removeDoorCard(id); closeModal(); toast('Card removed', 'info'); render(); }
 window.doDeleteDoor = doDeleteDoor;
 
 /* ================================================================
@@ -1053,8 +1060,8 @@ function confirmReset() {
 }
 window.confirmReset = confirmReset;
 
-function doReset() {
-  store.resetToDefaults(); closeModal();
+async function doReset() {
+  await store.resetToDefaults(); closeModal();
   toast('Data reset to defaults', 'info');
   state.cat='all'; state.status='all'; state.search=''; state.pageNum=0;
   render();
@@ -1277,7 +1284,7 @@ async function handleImportFile(e) {
     if (name.endsWith('.csv')) {
       const txt = await f.text();
       const rows = parseCSVToObjects(txt);
-      processImportedRows(rows, fileName);
+      await processImportedRows(rows, fileName);
     } else if (name.endsWith('.xls') || name.endsWith('.xlsx')) {
       if (typeof XLSX === 'undefined') {
         toast('XLSX parser not loaded — please use CSV', 'error');
@@ -1334,7 +1341,7 @@ async function handleImportFile(e) {
         }
       }
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { range: headerRowIndex, defval: '' });
-      processImportedRows(rows, fileName);
+      await processImportedRows(rows, fileName);
     } else {
       toast('Unsupported file type — please use CSV or Excel (.xls/.xlsx)', 'error');
     }
@@ -1420,7 +1427,7 @@ function inferCategory(row = {}) {
   return 'Desktop';
 }
 
-function processImportedRows(rows, fileName = 'unknown', headerRowIndex = 0) {
+async function processImportedRows(rows, fileName = 'unknown', headerRowIndex = 0) {
   if (!rows || !rows.length) { toast('No rows found to import', 'error'); return; }
   const headerMap = {
     'asset code':'code','code':'code','new convention':'code','new convention number':'code','new convention name':'code',
@@ -1433,7 +1440,7 @@ function processImportedRows(rows, fileName = 'unknown', headerRowIndex = 0) {
 
   let added = 0;
   let skippedRows = [];
-  rows.forEach((raw, index) => {
+  for (const [index, raw] of rows.entries()) {
     const out = {};
     Object.keys(raw).forEach(k => {
       const v = (raw[k] ?? '').toString().trim();
@@ -1450,21 +1457,21 @@ function processImportedRows(rows, fileName = 'unknown', headerRowIndex = 0) {
     out.user = out.user || '';
     out.sourceFile = fileName;
     out.code = out.code || out.serial || out.hostname;
-    
-    if (!out.code) { 
+
+    if (!out.code) {
       const dataValues = Object.values(raw).filter(val => val !== undefined && val !== null && String(val).trim() !== '');
-      if (dataValues.length <= 3) { 
-        return; // Silently ignore ghost rows
+      if (dataValues.length <= 3) {
+        continue; // Silently ignore ghost rows
       }
       // Row has full data but no code, import it anyway
       out.code = 'N/A';
     }
-    
-    try { store.add(out); added++; } catch (e) { 
-      console.warn('Import add failed', e); 
-      skippedRows.push(index + headerRowIndex + 2); 
+
+    try { await store.add(out); added++; } catch (e) {
+      console.warn('Import add failed', e);
+      skippedRows.push(index + headerRowIndex + 2);
     }
-  });
+  }
   store.recordImport(fileName, added);
   render();
   showImportResultModal(fileName, added, skippedRows);
@@ -1500,8 +1507,6 @@ function showImportResultModal(fileName, added, skippedRows = []) {
 }
 window.showImportResultModal = showImportResultModal;
 
-// sample import removed — use the Import file button instead
-
 function openImportedDataModal() {
   const imports = store.getImports();
   let html = `<div class="modal-header"><div class="modal-title">Imported data</div><button class="btn-close" onclick="closeModal()">✕</button></div><div class="modal-body">`;
@@ -1521,10 +1526,10 @@ function openImportedDataModal() {
 }
 window.openImportedDataModal = openImportedDataModal;
 
-function deleteImport(fileName) {
+async function deleteImport(fileName) {
   const msg = 'Delete all assets imported from "' + fileName + '"? This cannot be undone.';
   if (!confirm(msg)) return;
-  store.deleteImport(fileName);
+  await store.deleteImport(fileName);
   toast('Import from "' + fileName + '" deleted', 'info');
   render();
   openImportedDataModal();
